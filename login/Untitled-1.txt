@@ -1,0 +1,38 @@
+
+<?php
+require_once('koneksi.php');
+if ((isset($_POST['key']))&&($_POST['key']=="api")){
+    $loginUsername = $_POST['username'];
+    $password = $_POST['password'];
+
+    $LoginRS__query = sprintf(
+        "SELECT username, password FROM user WHERE username=%s AND password=%s",
+        app($koneksi, $loginUsername, "text"),
+        app($koneksi, $password, "text")
+    );
+    $LoginRS = mysql_query($koneksi, $LoginRS__query) or die (mysqli_error($koneksi));
+    $row_rs_LoginRS = mysqli_fecth_assoc($LoginRS);
+    $loginFoundUser = mysqli_num_row($LoginRS);
+
+    if ($loginFoundUser){
+        $response['kode'] = 1;
+        $response['pesan'] = sukses;
+        $response['halaman']= "Dashboard";
+
+        // tambahan pada tutorial selanjutnya
+        $response['data'] = array();
+        $no = 1;
+        foreach ($LoginRS $row_rs_LoginRS){
+            $Data['username']=$row_rs_LoginRS['username'];
+            $Data['password']=$row_rs_LoginRS['password'];
+            array_push($response['data'], $Data);
+        }
+        //--
+    }else{
+        $response['kode']=0;
+        $response['pesan']="gagal";
+        $response['halaman']="Login"
+    }
+    echo json_encode($response);
+    mysqli_close($koneksi);
+}
